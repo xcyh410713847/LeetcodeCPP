@@ -57,7 +57,10 @@ class Solution {
 public:
     double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {
         // 暴力破解
-        return bruteForceAttack(nums1, nums2);
+        // return bruteForceAttack(nums1, nums2);
+
+        // 暴力破解2
+        return bruteForceAttack2(nums1, nums2);
     }
 
 #pragma region 暴力破解
@@ -83,6 +86,43 @@ public:
             return (nums[size / 2 - 1] + nums[size / 2]) / 2.0;
         } else {
             return nums[size / 2];
+        }
+    }
+
+#pragma endregion
+
+#pragma region 暴力破解2
+    /* 暴力破解2
+        关键字
+            暴力破解
+        思路
+            1，相加两个数组的长度，得到中位数的位置
+            2，遍历两个数组，找到中位数的位置
+            3，如果是偶数，取中间两个数的平均值
+        复杂度分析
+            时间复杂度：O(m+n)
+            空间复杂度：O(1)
+    */
+
+    double bruteForceAttack2(vector<int>& nums1, vector<int>& nums2) {
+        int size1 = nums1.size();
+        int size2 = nums2.size();
+        int size = size1 + size2;
+        int mid = size / 2;
+        int i = 0, j = 0;
+        int pre = 0, cur = 0;
+        while (i + j <= mid) {
+            pre = cur;
+            if (i < size1 && (j >= size2 || nums1[i] < nums2[j])) {
+                cur = nums1[i++];
+            } else {
+                cur = nums2[j++];
+            }
+        }
+        if (size % 2 == 0) {
+            return (pre + cur) / 2.0;
+        } else {
+            return cur;
         }
     }
 
