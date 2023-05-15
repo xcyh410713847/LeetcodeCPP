@@ -60,7 +60,10 @@ public:
         // return bruteForceAttack(nums1, nums2);
 
         // 暴力破解2
-        return bruteForceAttack2(nums1, nums2);
+        // return bruteForceAttack2(nums1, nums2);
+
+        // 二分法
+        return binarySearch(nums1, nums2);
     }
 
 #pragma region 暴力破解
@@ -123,6 +126,72 @@ public:
             return (pre + cur) / 2.0;
         } else {
             return cur;
+        }
+    }
+
+#pragma endregion
+
+#pragma region 二分法
+    /* 二分法
+        关键字
+            二分法
+        思路
+            1，当 m+n 是奇数时，中位数是两个有序数组中的第 (m+n)/2 个元素
+            2，当 m+n 是偶数时，中位数是两个有序数组中的第 (m+n)/2 个元素和第 (m+n)/2+1 个元素的平均值
+            3，所以转换成寻找两个有序数组A和B中的第 k 小的数
+            4，比较 A[k/2-1] 和 B[k/2-1] 的大小，/ 表示整数除法
+                4.1，如果 A[k/2-1] < B[k/2-1]，则说明比A[k/2-1]小的数最多只有 k-2 个，所以 A[k/2-1] 不可能是第 k 小的数，A 数组中的第 k/2 个数也可以排除
+                4.2，反之，B 数组中的第 k/2 个数也可以排除
+                4.3，当 A[k/2-1] = B[k/2-1] 时，归入第 4.1 的情况
+            5，边界情况
+                5.1，其中一个数组为空，则直接返回另一个数组的第 k 小的数
+                5.2，当 k=1 时，返回 min(A[0], B[0])
+                5.3，如果 A[k/2-1] 或者 B[k/2-1] 越界，则取整个数组的最后一个元素
+        复杂度分析
+            时间复杂度：O(log(m+n))
+            空间复杂度：O(1)
+    */
+
+    int getKthElement(const vector<int>& nums1, const vector<int>& nums2, int k) {
+        int m = nums1.size();
+        int n = nums2.size();
+        int index1 = 0, index2 = 0;
+
+        while (true) {
+            // 边界情况
+            if (index1 == m) {
+                return nums2[index2 + k - 1];
+            }
+            if (index2 == n) {
+                return nums1[index1 + k - 1];
+            }
+            if (k == 1) {
+                return min(nums1[index1], nums2[index2]);
+            }
+
+            // 正常情况
+            int newIndex1 = min(index1 + k / 2 - 1, m - 1);
+            int newIndex2 = min(index2 + k / 2 - 1, n - 1);
+            int pivot1 = nums1[newIndex1];
+            int pivot2 = nums2[newIndex2];
+            if (pivot1 <= pivot2) {
+                k -= newIndex1 - index1 + 1;
+                index1 = newIndex1 + 1;
+            }
+            else {
+                k -= newIndex2 - index2 + 1;
+                index2 = newIndex2 + 1;
+            }
+        }
+    }
+
+    double binarySearch(vector<int>& nums1, vector<int>& nums2) {
+        int totalLength = nums1.size() + nums2.size();
+        if (totalLength % 2 == 1) {
+            return getKthElement(nums1, nums2, (totalLength + 1) / 2);
+        }
+        else {
+            return (getKthElement(nums1, nums2, totalLength / 2) + getKthElement(nums1, nums2, totalLength / 2 + 1)) / 2.0;
         }
     }
 
